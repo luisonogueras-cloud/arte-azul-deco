@@ -600,8 +600,9 @@
   .wall .x{background:none;border:1px solid var(--line);color:var(--ink-soft);min-height:44px;min-width:44px;cursor:pointer;}
   @media (max-width:560px){.wall{grid-template-columns:minmax(0,1fr) minmax(0,1fr) auto;}.wall .field:first-child{grid-column:1/-1;}}
   .calc .field input,.calc .field select{min-height:44px;font-size:16px;}
-  .calc-opts{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:0.6rem;margin-top:1rem;}
-  @media (max-width:560px){.calc-opts{grid-template-columns:minmax(0,1fr) minmax(0,1fr);}}
+  .unit-pick{max-width:260px;margin-bottom:1rem;}
+  .calc-opts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0.6rem;margin-top:1rem;}
+  
   .calc-card{background:var(--azul-deep);color:var(--panel-ink);padding:clamp(1.5rem,3vw,2.2rem);position:sticky;top:90px;}
   @media (max-width:860px){.calc-card{position:static;}}
   .calc-card .eyebrow{color:var(--brass);}
@@ -861,30 +862,29 @@
     <div class="container">
       <div class="section-head">
         <p class="eyebrow">Calcula tu proyecto</p>
-        <h2>Medí tus paredes y mirá un estimado al instante</h2>
-        <p style="color:var(--ink-soft);margin-top:0.9rem;">Anotá el ancho y el alto de cada pared. Te mostramos el área, la pintura aproximada y un rango de precio. Después lo enviás con tu consulta.</p>
+        <h2>Medí tus paredes antes de tu consulta</h2>
+        <p style="color:var(--ink-soft);margin-top:0.9rem;">Anotá el ancho y el alto de cada pared. Te mostramos el área y la pintura aproximada. Después lo enviás con tu consulta y te preparamos una cotización a la medida.</p>
       </div>
       <div class="calc-grid">
         <div>
           <div class="svc-pick" id="svcPick" role="group" aria-label="Tipo de trabajo"></div>
+          <div class="field unit-pick"><label for="cu">¿En qué vas a medir?</label><select id="cu"><option value="ft">Pies</option><option value="m">Metros</option></select></div>
           <div id="walls"></div>
           <button type="button" class="btn btn-ghost" id="addWall">+ Añadir pared</button>
           <div class="calc-opts">
-            <div class="field"><label for="cu">Medidas en</label><select id="cu"><option value="ft">Pies</option><option value="m">Metros</option></select></div>
-            <div class="field"><label for="cd">Puertas a descontar</label><input type="number" id="cd" min="0" value="0"></div>
-            <div class="field"><label for="cw">Ventanas a descontar</label><input type="number" id="cw" min="0" value="0"></div>
+            <div class="field"><label for="cd">Puertas a descontar</label><input type="number" id="cd" min="0" placeholder="0"></div>
+            <div class="field"><label for="cw">Ventanas a descontar</label><input type="number" id="cw" min="0" placeholder="0"></div>
           </div>
         </div>
         <aside class="calc-card" aria-live="polite">
-          <p class="eyebrow">Tu estimado</p>
+          <p class="eyebrow">Tus medidas</p>
           <p class="calc-big" id="cArea">0<small>pie²</small></p>
           <div class="wallviz" id="cViz" aria-hidden="true"></div>
           <ul class="calc-rows">
             <li><span>Servicio</span><strong id="cSvc"></strong></li>
             <li><span>Pintura aprox. (2 manos)</span><strong id="cGal"></strong></li>
-            <li><span>Rango estimado</span><strong id="cPrice"></strong></li>
           </ul>
-          <p class="calc-note">Estimado orientativo. El precio final se confirma en la visita, según el diseño, la superficie y la altura.</p>
+          <p class="calc-note">La cotización se prepara en la consulta, según el diseño, la superficie y la altura de la pared.</p>
           <button type="button" class="btn" id="cSend">Usar en mi consulta →</button>
         </aside>
       </div>
@@ -1020,15 +1020,13 @@
     });
   }
   (function(){
-    // Tarifas por pie cuadrado (EDITAR con los precios reales)
     var SVC=[
-      {id:'pintura',name:'Pintura de paredes',desc:'Color liso, interior',min:1.5,max:2.5},
-      {id:'acento',name:'Pared de acento',desc:'Geométrico o diseño simple',min:4,max:7},
-      {id:'mural',name:'Mural artístico',desc:'Diseño a mano, a la medida',min:12,max:25}
+      {id:'pintura',name:'Pintura de paredes',desc:'Color liso, interior'},
+      {id:'acento',name:'Pared de acento',desc:'Geométrico o diseño simple'},
+      {id:'mural',name:'Mural artístico',desc:'Diseño a mano, a la medida'}
     ];
-    var M2=10.7639, svc='mural', walls=[{n:'Pared principal',w:12,h:9}];
+    var M2=10.7639, svc='mural', walls=[{n:'Pared principal',w:'',h:''}];
     var $=function(id){return document.getElementById(id)};
-    var money=function(n){return '$'+Math.round(n).toLocaleString('en-US')};
     var esc=function(t){return String(t).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})};
     var unit=function(){return $('cu').value};
     function drawSvc(){
@@ -1038,8 +1036,8 @@
       var u=unit()==='m'?'m':'pies';
       $('walls').innerHTML=walls.map(function(w,i){return '<div class="wall">'
         +'<div class="field"><label for="wn'+i+'">Pared</label><input id="wn'+i+'" data-i="'+i+'" data-k="n" value="'+esc(w.n)+'"></div>'
-        +'<div class="field"><label for="ww'+i+'">Ancho ('+u+')</label><input type="number" min="0" step="0.1" id="ww'+i+'" data-i="'+i+'" data-k="w" value="'+w.w+'"></div>'
-        +'<div class="field"><label for="wh'+i+'">Alto ('+u+')</label><input type="number" min="0" step="0.1" id="wh'+i+'" data-i="'+i+'" data-k="h" value="'+w.h+'"></div>'
+        +'<div class="field"><label for="ww'+i+'">Ancho ('+u+')</label><input type="number" min="0" step="0.1" id="ww'+i+'" data-i="'+i+'" data-k="w" placeholder="Ej. 12" value="'+w.w+'"></div>'
+        +'<div class="field"><label for="wh'+i+'">Alto ('+u+')</label><input type="number" min="0" step="0.1" id="wh'+i+'" data-i="'+i+'" data-k="h" placeholder="Ej. 9" value="'+w.h+'"></div>'
         +'<button type="button" class="x" data-del="'+i+'" aria-label="Quitar pared">✕</button></div>'}).join('');
     }
     function calc(){
@@ -1053,21 +1051,20 @@
       $('cArea').innerHTML=Math.round(net).toLocaleString('en-US')+'<small>pie²'+(unit()==='m'?' ('+(net/M2).toFixed(1)+' m²)':'')+'</small>';
       $('cSvc').textContent=s.name;
       $('cGal').textContent=net?gal+' galón'+(gal>1?'es':''):'—';
-      $('cPrice').textContent=net?money(net*s.min)+' – '+money(net*s.max):'—';
       return {net:net,s:s,gal:gal};
     }
     drawSvc();drawWalls();calc();
     $('svcPick').addEventListener('click',function(e){var b=e.target.closest('button');if(b){svc=b.dataset.s;drawSvc();calc();}});
     $('walls').addEventListener('input',function(e){var t=e.target;if(t.dataset.i==null)return;walls[t.dataset.i][t.dataset.k]=t.dataset.k==='n'?t.value:t.value;calc();});
     $('walls').addEventListener('click',function(e){var d=e.target.dataset.del;if(d!=null&&walls.length>1){walls.splice(+d,1);drawWalls();calc();}});
-    $('addWall').addEventListener('click',function(){walls.push({n:'Pared '+(walls.length+1),w:10,h:8});drawWalls();calc();});
+    $('addWall').addEventListener('click',function(){walls.push({n:'Pared '+(walls.length+1),w:'',h:''});drawWalls();calc();});
     ['cu','cd','cw'].forEach(function(id){$(id).addEventListener('input',function(){if(id==='cu')drawWalls();calc();});});
     $('cSend').addEventListener('click',function(){
       var r=calc(), u=unit()==='m'?'m':'pies';
       var lines=['Servicio: '+r.s.name];
       walls.forEach(function(w){lines.push('- '+w.n+': '+w.w+' x '+w.h+' '+u)});
       lines.push('Puertas: '+($('cd').value||0)+' · Ventanas: '+($('cw').value||0));
-      lines.push('Área aprox.: '+Math.round(r.net)+' pie²','Estimado de la página: '+$('cPrice').textContent,'');
+      lines.push('Área aprox.: '+Math.round(r.net)+' pie²','');
       var m=$('cf-mensaje'); m.value=lines.join('\n')+(m.value&&m.value.indexOf('Servicio:')!==0?m.value:'');
       document.getElementById('contacto').scrollIntoView({behavior:'smooth'});
       setTimeout(function(){$('cf-nombre').focus({preventScroll:true});},500);
