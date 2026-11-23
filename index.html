@@ -821,7 +821,7 @@
         <div class="process-step">
           <p class="process-num">04</p>
           <h3>Sellado y entrega</h3>
-          <p>Aplicamos un sellador protector y recorremos el resultado final con vos.</p>
+          <p>Aplicamos un sellador protector y recorremos el resultado final contigo.</p>
         </div>
       </div>
     </div>
@@ -833,8 +833,8 @@
     <div class="container">
       <div class="section-head">
         <p class="eyebrow">Calcula tu proyecto</p>
-        <h2>Medí tus paredes antes de tu consulta</h2>
-        <p style="color:var(--ink-soft);margin-top:0.9rem;">Anotá el ancho y el alto de cada pared. Te mostramos el área y la pintura aproximada. Después lo enviás con tu consulta y te preparamos una cotización a la medida.</p>
+        <h2>Mide tus paredes antes de tu consulta</h2>
+        <p style="color:var(--ink-soft);margin-top:0.9rem;">Anota el ancho y el alto de cada pared. Te mostramos el área y la pintura aproximada. Después lo envías con tu consulta y te preparamos una cotización a la medida.</p>
       </div>
       <div class="calc-grid">
         <div>
@@ -867,7 +867,7 @@
       <div>
         <p class="eyebrow">Contacto</p>
         <h2>Conversemos sobre tu próximo mural.</h2>
-        <p class="contact-sub">Contanos qué estás imaginando para esa pared y coordinamos una primera visita sin costo.</p>
+        <p class="contact-sub">Cuéntanos qué estás imaginando para esa pared y coordinamos una primera visita sin costo.</p>
         <form class="consult-form" id="consultForm" novalidate>
           <div class="form-grid">
             <div class="field">
@@ -891,7 +891,7 @@
               </select>
             </div>
             <div class="field field-full">
-              <label for="cf-mensaje">Contanos tu idea</label>
+              <label for="cf-mensaje">Cuéntanos tu idea</label>
               <textarea id="cf-mensaje" name="mensaje" rows="4" placeholder="Ej: quiero un mural botánico en el living de mi casa, una pared de unos 4x3 metros…" required></textarea>
             </div>
           </div>
@@ -902,7 +902,7 @@
           </div>
           <p class="form-status" id="consultStatus" role="status"></p>
         </form>
-        <p class="contact-alt">¿Preferís algo más directo? <a href="https://wa.me/17873464848" target="_blank" rel="noopener">Escribinos por WhatsApp</a>.</p>
+        <p class="contact-alt">¿Prefieres algo más directo? <a href="https://wa.me/17873464848" target="_blank" rel="noopener">Escríbenos por WhatsApp</a>.</p>
       </div>
       <div class="contact-card">
         <ul class="contact-list">
@@ -972,8 +972,8 @@
       e.preventDefault();
       var f = consultForm, btn = document.getElementById('sendBtn');
       var nombre = f.nombre.value.trim(), email = f.email.value.trim(), mensaje = f.mensaje.value.trim();
-      if (!nombre || !email || !mensaje) { say('Completá tu nombre, email y una breve idea antes de enviar.', true); return; }
-      if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) { say('Revisá que el email esté bien escrito.', true); return; }
+      if (!nombre || !email || !mensaje) { say('Completa tu nombre, email y una breve idea antes de enviar.', true); return; }
+      if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) { say('Revisa que el email esté bien escrito.', true); return; }
       if (f.botcheck.checked) return;
       btn.disabled = true; btn.textContent = 'Enviando…';
       fetch('https://api.web3forms.com/submit', {
@@ -994,10 +994,10 @@
           f.reset();
           say('¡Gracias, ' + nombre + '! Recibimos tu consulta y te contactamos pronto.');
         } else {
-          say('No se pudo enviar. Probá otra vez o escribinos a arteazuldecoracion@gmail.com.', true);
+          say('No se pudo enviar. Prueba otra vez o escríbenos a arteazuldecoracion@gmail.com.', true);
         }
       }).catch(function(){
-        say('No se pudo enviar (revisá tu conexión). También podés escribirnos a arteazuldecoracion@gmail.com.', true);
+        say('No se pudo enviar (revisa tu conexión). También puedes escribirnos a arteazuldecoracion@gmail.com.', true);
       }).then(function(){ btn.disabled = false; btn.textContent = 'Enviar consulta'; });
     });
   }
